@@ -3,18 +3,19 @@ extends ProfileItem
 class_name NodeItem
 
 @export var node_path: NodePath
-@export_tool_button("Pick property") var pick_property_button = pick_property
-@export var property: StringName
+@export var entries: Array[PropertyEntry] = []:
+	set(p_entries):
+		entries = p_entries
+		_sync_targets()
 
 func apply() -> void:
 	pass
 
-func pick_property() -> void:
-	var target = SceneProfileInterpretor.instance.get_node_or_null(node_path)
-	EditorInterface.popup_property_selector(target, _on_property_selected, PackedInt32Array(), property)
 
-func _on_property_selected(p_property_path: NodePath) -> void:
-	if p_property_path.is_empty():
+func _sync_targets() -> void:
+	if SceneProfileInterpretor.instance == null:
 		return
-	property = p_property_path.get_concatenated_subnames()
-	print(property)
+	
+	for entry in entries:
+		if entry == null: continue
+		entry.target = SceneProfileInterpretor.instance.get_node_or_null(node_path)
