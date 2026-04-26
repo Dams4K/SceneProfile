@@ -1,10 +1,11 @@
 @tool
 extends EditorPlugin
-class_name _SceneProfilePlugin
 
 const HELPER_NAME = "SceneProfilePluginHelper"
 
-var presets_button := PresetsButton.new()
+const PresetsButton := preload("res://addons/scene_profile/presets_button.gd")
+
+var presets_button: OptionButton
 
 
 func _enable_plugin() -> void:
@@ -20,7 +21,8 @@ func _disable_plugin() -> void:
 
 func _enter_tree() -> void:
 	_add_preset_setting()
-	_add_presets_button()
+	presets_button = PresetsButton.new()
+	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, presets_button)
 
 
 func _exit_tree() -> void:
@@ -67,25 +69,3 @@ func _add_setting(name: String, value: Variant, type: int, hint: int = PROPERTY_
 
 static func get_setting_name(name: String, feature: String = "") -> String:
 	return name if feature.is_empty() else "%s.%s" % [name, feature]
-
-
-func _add_presets_button() -> void:
-	presets_button.item_selected.connect(_on_presets_selected)
-	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, presets_button)
-
-
-func _on_presets_selected(preset: Presets.Quality) -> void:
-	ProjectSettings.set_setting(Presets.S_PRESET, preset)
-	ProjectSettings.save()
-	SceneProfilePluginHelper.update_opened_scenes()
-
-
-class PresetsButton extends OptionButton:
-	func _ready() -> void:
-		add_theme_font_override("font", EditorInterface.get_editor_theme().get_font("bold", "EditorFonts"))
-		
-		for i in range(Presets.Quality.size()):
-			var preset: String = Presets.Quality.keys()[i]
-			add_item(preset.capitalize(), i)
-		
-		select(Presets.get_quality())
