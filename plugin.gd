@@ -11,7 +11,7 @@ var presets_button := PresetsButton.new()
 
 
 static func get_preset() -> SceneProfileInterpretor.Presets:
-	return ProjectSettings.get_setting(S_PRESET, 0)
+	return ProjectSettings.get_setting(S_PRESET, SceneProfileInterpretor.Presets.MEDIUM)
 
 
 func _enable_plugin() -> void:
@@ -19,7 +19,9 @@ func _enable_plugin() -> void:
 
 
 func _disable_plugin() -> void:
-	pass
+	ProjectSettings.clear(S_PRESET)
+	ProjectSettings.clear(get_setting_name(S_PRESET, F_RELEASE))
+	ProjectSettings.save()
 
 
 func _enter_tree() -> void:
@@ -28,9 +30,6 @@ func _enter_tree() -> void:
 
 
 func _exit_tree() -> void:
-	ProjectSettings.clear(S_PRESET)
-	ProjectSettings.clear(get_setting_name(S_PRESET, F_RELEASE))
-	ProjectSettings.save()
 	remove_control_from_container(EditorPlugin.CONTAINER_TOOLBAR, presets_button)
 
 
@@ -82,15 +81,27 @@ func _add_presets_button() -> void:
 
 func _on_presets_selected(preset: SceneProfileInterpretor.Presets) -> void:
 	ProjectSettings.set_setting(S_PRESET, preset)
-	_update_scenes()
+	ProjectSettings.save()
+	update_scenes()
 
 
-func _update_scenes() -> void:
+static func update_scenes() -> void:
 	var open_scenes := EditorInterface.get_open_scene_roots()
 	for scene: Node in open_scenes:
-		var interpretors := scene.find_children("*", "SceneProfileInterpretor")
-		for interpretor in interpretors:
-			interpretor.apply()
+		update_scene(scene)
+
+
+static func update_current_scene() -> void:
+	update_scene(EditorInterface.get_edited_scene_root())
+
+
+static func update_scene(scene: Node) -> void:
+	if scene == null:
+		return
+	
+	var interpretors := scene.find_children("*", "SceneProfileInterpretor")
+	for interpretor in interpretors:
+		interpretor.apply()
 
 
 class PresetsButton extends OptionButton:
@@ -101,4 +112,4 @@ class PresetsButton extends OptionButton:
 			var preset: String = SceneProfileInterpretor.Presets.keys()[i]
 			add_item(preset.capitalize(), i)
 		
-		selected = ProjectSettings.get_setting(S_PRESET, 0) as int
+		select(ProjectSettings.get_setting(S_PRESET, SceneProfileInterpretor.Presets.MEDIUM))

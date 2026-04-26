@@ -1,28 +1,28 @@
 @tool
-extends ProfileItem
+extends EntriesItem
 class_name NodeItem
 
-@export var node_path: NodePath
-@export var entries: Array[PropertyEntry] = []:
-	set(p_entries):
-		entries = p_entries
-		_sync_targets()
-
-
-func apply(preset: SceneProfileInterpretor.Presets) -> void:
-	var target := get_target()
-	for entry in entries:
-		target.set(entry.property, entry.get_value(preset))
+@export var node_path: NodePath : set = set_node_path
 
 
 func get_target() -> Object:
+	if interpretor == null:
+		return null
 	return interpretor.get_node_or_null(node_path)
 
 
+func apply(preset: SceneProfileInterpretor.Presets) -> void:
+	target = get_target()
+	super.apply(preset)
+
+
+func set_node_path(value) -> void:
+	node_path = value
+	target = get_target()
+
+
 func _sync_targets() -> void:
-	if interpretor == null:
-		return
+	if interpretor == null: return
 	
-	for entry in entries:
-		if entry == null: continue
-		entry.target = get_target()
+	target = get_target()
+	super._sync_targets()

@@ -2,7 +2,7 @@
 extends Resource
 class_name PropertyEntry
 
-@export_storage var target: Object = null
+var target: Object = null
 @export var property: StringName = "":
 	set(value):
 		property = value
@@ -79,6 +79,7 @@ func _set(p_property: StringName, p_value: Variant) -> bool:
 	if idx == -1:
 		return false
 	_values[idx] = p_value
+	SceneProfilePlugin.update_current_scene()
 	return true
 
 

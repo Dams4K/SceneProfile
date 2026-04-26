@@ -18,7 +18,9 @@ enum Presets {
 
 
 func _ready() -> void:
+	_sync_interpretors()
 	apply()
+
 
 
 func _sync_interpretors() -> void:
