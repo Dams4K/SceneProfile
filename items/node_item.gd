@@ -11,9 +11,12 @@ func get_target() -> Object:
 	return interpretor.get_node_or_null(node_path)
 
 
-func apply(preset: SceneProfileInterpretor.Presets) -> void:
+func apply(quality: Presets.Quality) -> void:
 	target = get_target()
-	super.apply(preset)
+	if target == null:
+		push_warning("NodeItem: target is null for node_path: %s" % node_path)
+		return
+	super.apply(quality)
 
 
 func set_node_path(value) -> void:

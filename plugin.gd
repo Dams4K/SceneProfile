@@ -1,27 +1,21 @@
 @tool
 extends EditorPlugin
-class_name SceneProfilePlugin
+class_name _SceneProfilePlugin
 
-const F_RELEASE = "template_release"
-
-const S_SCENE_PROFILE = "scene_profile/%s"
-const S_PRESET = S_SCENE_PROFILE % "preset"
+const HELPER_NAME = "SceneProfilePluginHelper"
 
 var presets_button := PresetsButton.new()
 
 
-static func get_preset() -> SceneProfileInterpretor.Presets:
-	return ProjectSettings.get_setting(S_PRESET, SceneProfileInterpretor.Presets.MEDIUM)
-
-
 func _enable_plugin() -> void:
-	pass
+	add_autoload_singleton(HELPER_NAME, "res://addons/scene_profile/scene_profile_plugin_helper.gd")
 
 
 func _disable_plugin() -> void:
-	ProjectSettings.clear(S_PRESET)
-	ProjectSettings.clear(get_setting_name(S_PRESET, F_RELEASE))
+	ProjectSettings.clear(Presets.S_PRESET)
+	ProjectSettings.clear(get_setting_name(Presets.S_PRESET, Presets.F_RELEASE))
 	ProjectSettings.save()
+	remove_autoload_singleton(HELPER_NAME)
 
 
 func _enter_tree() -> void:
@@ -34,25 +28,25 @@ func _exit_tree() -> void:
 
 
 func _add_preset_setting() -> void:
-	var presets: Array = SceneProfileInterpretor.Presets.keys()
+	var presets: Array = Presets.Quality.keys()
 	for i in range(presets.size()):
 		presets[i] = presets[i].capitalize()
 	
 	_add_setting(
-		S_PRESET,
-		SceneProfileInterpretor.Presets.MEDIUM,
+		Presets.S_PRESET,
+		Presets.Quality.MEDIUM,
 		TYPE_INT,
 		PROPERTY_HINT_ENUM,
 		",".join(presets)
 	)
 	
 	_add_setting(
-		S_PRESET,
-		SceneProfileInterpretor.Presets.MEDIUM,
+		Presets.S_PRESET,
+		Presets.Quality.MEDIUM,
 		TYPE_INT,
 		PROPERTY_HINT_ENUM,
 		",".join(presets),
-		F_RELEASE
+		Presets.F_RELEASE
 	)
 
 
@@ -79,37 +73,18 @@ func _add_presets_button() -> void:
 	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, presets_button)
 
 
-func _on_presets_selected(preset: SceneProfileInterpretor.Presets) -> void:
-	ProjectSettings.set_setting(S_PRESET, preset)
+func _on_presets_selected(preset: Presets.Quality) -> void:
+	ProjectSettings.set_setting(Presets.S_PRESET, preset)
 	ProjectSettings.save()
-	update_scenes()
-
-
-static func update_scenes() -> void:
-	var open_scenes := EditorInterface.get_open_scene_roots()
-	for scene: Node in open_scenes:
-		update_scene(scene)
-
-
-static func update_current_scene() -> void:
-	update_scene(EditorInterface.get_edited_scene_root())
-
-
-static func update_scene(scene: Node) -> void:
-	if scene == null:
-		return
-	
-	var interpretors := scene.find_children("*", "SceneProfileInterpretor")
-	for interpretor in interpretors:
-		interpretor.apply()
+	SceneProfilePluginHelper.update_opened_scenes()
 
 
 class PresetsButton extends OptionButton:
 	func _ready() -> void:
 		add_theme_font_override("font", EditorInterface.get_editor_theme().get_font("bold", "EditorFonts"))
 		
-		for i in range(SceneProfileInterpretor.Presets.size()):
-			var preset: String = SceneProfileInterpretor.Presets.keys()[i]
+		for i in range(Presets.Quality.size()):
+			var preset: String = Presets.Quality.keys()[i]
 			add_item(preset.capitalize(), i)
 		
-		select(ProjectSettings.get_setting(S_PRESET, SceneProfileInterpretor.Presets.MEDIUM))
+		select(Presets.get_quality())

@@ -15,20 +15,17 @@ func set_entries(p_entries: Array[PropertyEntry]) -> void:
 	_sync_targets()
 
 
-func apply(preset: SceneProfileInterpretor.Presets) -> void:
+func apply(quality: Presets.Quality) -> void:
 	assert(target != null, "Target can't be null")
 	for entry: PropertyEntry in entries:
-		set_property(entry, preset)
+		set_property(entry, quality)
 
 
-func set_property(entry: PropertyEntry, preset: SceneProfileInterpretor.Presets) -> void:
-	target.set(entry.property, entry.get_value(preset))
+func set_property(entry: PropertyEntry, quality: Presets.Quality) -> void:
+	target.set(entry.property, entry.get_value(quality))
 
 
 func _sync_targets() -> void:
-	if interpretor == null:
-		return
-	
 	for entry in entries:
 		if entry == null: continue
 		entry.target = target

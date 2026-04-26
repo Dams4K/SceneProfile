@@ -2,7 +2,7 @@
 extends Resource
 class_name PropertyEntry
 
-var target: Object = null
+@export_custom(PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE) var target: Object = null
 @export var property: StringName = "":
 	set(value):
 		property = value
@@ -11,18 +11,19 @@ var target: Object = null
 
 var _values: Array[Variant] = []
 
+var _cached_property_info: Dictionary = {}
+
 func _init() -> void:
-	_values.resize(SceneProfileInterpretor.Presets.size())
+	_values.resize(Presets.Quality.size())
 
 
-func get_value(preset: SceneProfileInterpretor.Presets) -> Variant:
-	return _get(SceneProfileInterpretor.Presets.keys()[preset])
+func get_value(quality: Presets.Quality) -> Variant:
+	return _get(Presets.Quality.keys()[quality])
 
 
 func _pick_property() -> void:
 	assert(target != null, "Target object can't be null")
-	
-	EditorInterface.popup_property_selector(target, _on_property_selected, PackedInt32Array(), property)
+	SceneProfilePluginHelper.popup_property_selector(target, _on_property_selected, PackedInt32Array(), property)
 
 
 func _on_property_selected(p_property_path: NodePath) -> void:
@@ -30,6 +31,7 @@ func _on_property_selected(p_property_path: NodePath) -> void:
 		return
 	property = p_property_path.get_concatenated_subnames()
 	_init_default_values()
+	_cache_property_info()
 
 
 func _init_default_values() -> void:
@@ -40,24 +42,25 @@ func _init_default_values() -> void:
 		_values[i] = current_value
 
 
-func _get_property_type() -> Dictionary:
+func _cache_property_info() -> void:
 	if target == null or property.is_empty():
-		return {}
+		return
+	
 	for prop in target.get_property_list():
 		if prop["name"] == property:
-			return prop
-	return {}
+			_cached_property_info = prop
+	return
 
 
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
-	var property_info := _get_property_type()
+	var property_info := _cached_property_info
 	if property_info.is_empty():
 		return properties
 	
-	for preset: String in SceneProfileInterpretor.Presets.keys():
+	for quality: String in Presets.Quality.keys():
 		properties.append({
-			name = preset,
+			name = quality,
 			type = property_info.get("type", TYPE_NIL),
 			hint = property_info.get("hint", PROPERTY_HINT_NONE),
 			hint_string = property_info.get("hint_string", ""),
@@ -68,23 +71,23 @@ func _get_property_list() -> Array[Dictionary]:
 
 
 func _get(p_property: StringName) -> Variant:
-	var idx: int = SceneProfileInterpretor.Presets.get(p_property.to_upper(), -1)
+	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
 	if idx == -1:
 		return null
 	return _values[idx]
 
 
 func _set(p_property: StringName, p_value: Variant) -> bool:
-	var idx: int = SceneProfileInterpretor.Presets.get(p_property.to_upper(), -1)
+	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
 	if idx == -1:
 		return false
 	_values[idx] = p_value
-	SceneProfilePlugin.update_current_scene()
+	SceneProfilePluginHelper.update_current_scene()
 	return true
 
 
 func _property_can_revert(p_property: StringName) -> bool:
-	return SceneProfileInterpretor.Presets.get(p_property.to_upper(), -1) != -1
+	return Presets.Quality.get(p_property.to_upper(), -1) != -1
 
 
 func _property_get_revert(p_property: StringName) -> Variant:
