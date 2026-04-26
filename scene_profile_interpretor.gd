@@ -18,6 +18,7 @@ func _ready() -> void:
 
 func _sync_interpretors() -> void:
 	for item: ProfileItem in items:
+		if item == null: continue
 		item.interpretor = self
 
 

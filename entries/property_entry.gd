@@ -72,6 +72,17 @@ func _get_property_list() -> Array[Dictionary]:
 	return properties
 
 
+func _get_quality_property(quality: String) -> Dictionary:
+	var property_info := _cached_property_info
+	return {
+		name = quality,
+		type = property_info.get("type", TYPE_NIL),
+		hint = property_info.get("hint", PROPERTY_HINT_NONE),
+		hint_string = property_info.get("hint_string", ""),
+		usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+	}
+
+
 func _get(p_property: StringName) -> Variant:
 	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
 	return _values.get(idx, null)
