@@ -9,7 +9,6 @@ class_name MethodEntry
 
 @export_tool_button("Pick") var pick_method_button = _pick_method
 
-
 func _pick_method() -> void:
 	assert(target != null, "Target object can't be null")
 	SceneProfilePluginHelper.popup_method_selector(target, _on_method_selected, method)
@@ -25,15 +24,20 @@ func is_valid() -> bool:
 
 
 func apply(quality: Presets.Quality) -> void:
+	print("MethodEntry apply | valid: %s | target: %s | method: %s | value: %s" % [
+		is_valid(), target, method, get_value(quality)
+	])
 	if not is_valid(): return
-	target.call(method)
+	
+	var arguments: Arguments = get_value(quality)
+	target.callv(method, arguments.arguments)
 
 
 func _get_quality_property(quality: String) -> Dictionary:
 	return {
 		name = quality,
-		type = TYPE_NIL,
-		hint = PROPERTY_HINT_NONE,
-		hint_string = "",
+		type = TYPE_OBJECT,
+		hint = PROPERTY_HINT_RESOURCE_TYPE,
+		hint_string = "Arguments",
 		usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 	}

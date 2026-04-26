@@ -2,7 +2,10 @@
 extends Node
 class_name SceneProfileInterpretor
 
-@export var editor_preset := Presets.Quality.MEDIUM
+@export var quality := Presets.get_quality():
+	set(v):
+		quality = v
+		apply()
 
 @export var items: Array[ProfileItem] = []:
 	set(value):
@@ -23,6 +26,5 @@ func _sync_interpretors() -> void:
 
 
 func apply() -> void:
-	var quality := Presets.get_quality()
 	for item: ProfileItem in items:
 		item.apply(quality)
