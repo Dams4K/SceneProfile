@@ -1,25 +1,14 @@
 @tool
-extends Resource
+extends Entry
 class_name PropertyEntry
 
-@export_custom(PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE) var target: Object = null :
-	set(value):
-		target = value
-		_cache_property_info()
 @export var property: StringName = "":
 	set(value):
 		property = value
 		notify_property_list_changed()
 @export_tool_button("Pick") var pick_property_button = _pick_property
 
-@export_storage var _values: Dictionary[int, Variant] = {}
-
 var _cached_property_info: Dictionary = {}
-
-
-
-func get_value(quality: Presets.Quality) -> Variant:
-	return _get(Presets.Quality.keys()[quality])
 
 
 func _pick_property() -> void:
@@ -43,6 +32,11 @@ func _init_default_values() -> void:
 		_values[i] = current_value
 
 
+func set_target(p_target) -> void:
+	super.set_target(p_target)
+	_cache_property_info()
+
+
 func _cache_property_info() -> void:
 	if target == null or property.is_empty():
 		return
@@ -53,23 +47,11 @@ func _cache_property_info() -> void:
 	return
 
 
-func _get_property_list() -> Array[Dictionary]:
-	var properties: Array[Dictionary] = []
-	var property_info := _cached_property_info
-	
-	if property_info.is_empty():
-		return properties
-	
-	for quality: String in Presets.Quality.keys():
-		properties.append({
-			name = quality,
-			type = property_info.get("type", TYPE_NIL),
-			hint = property_info.get("hint", PROPERTY_HINT_NONE),
-			hint_string = property_info.get("hint_string", ""),
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		})
-	
-	return properties
+func is_valid() -> bool:
+	return target != null and property != null and not property.is_empty()
+
+func apply(quality: Presets.Quality) -> void:
+	target.set(property, get_value(quality))
 
 
 func _get_quality_property(quality: String) -> Dictionary:
@@ -81,20 +63,6 @@ func _get_quality_property(quality: String) -> Dictionary:
 		hint_string = property_info.get("hint_string", ""),
 		usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 	}
-
-
-func _get(p_property: StringName) -> Variant:
-	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
-	return _values.get(idx, null)
-
-
-func _set(p_property: StringName, p_value: Variant) -> bool:
-	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
-	if idx == -1:
-		return false
-	_values[idx] = p_value
-	SceneProfilePluginHelper.update_current_scene()
-	return true
 
 
 func _property_can_revert(p_property: StringName) -> bool:

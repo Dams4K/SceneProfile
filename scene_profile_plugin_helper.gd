@@ -42,3 +42,10 @@ func popup_property_selector(object: Object, callback: Callable, type_filter: Pa
 	var editor_interface = get_editor_interface()
 	if editor_interface == null: return
 	editor_interface.popup_property_selector(object, callback, type_filter, current_value)
+
+
+func popup_method_selector(object: Object, callback: Callable, current_value: String = "") -> void:
+	if not Engine.is_editor_hint(): return
+	var editor_interface = get_editor_interface()
+	if editor_interface == null: return
+	editor_interface.popup_method_selector(object, callback, current_value)

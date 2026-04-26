@@ -14,11 +14,13 @@ func set_target(p_target) -> void:
 func get_value(quality: Presets.Quality) -> Variant:
 	return _get(Presets.Quality.keys()[quality])
 
-
+@abstract func is_valid() -> bool
+@abstract func apply(quality: Presets.Quality) -> void
 @abstract func _get_quality_property(quality: String) -> Dictionary
 
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
+	if not is_valid(): return properties
 	
 	for quality: String in Presets.Quality.keys():
 		properties.append(_get_quality_property(quality))
