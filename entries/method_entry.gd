@@ -24,9 +24,6 @@ func is_valid() -> bool:
 
 
 func apply(quality: Presets.Quality) -> void:
-	print("MethodEntry apply | valid: %s | target: %s | method: %s | value: %s" % [
-		is_valid(), target, method, get_value(quality)
-	])
 	if not is_valid(): return
 	
 	var arguments: Arguments = get_value(quality)
