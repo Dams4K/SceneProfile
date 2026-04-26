@@ -61,7 +61,8 @@ func _add_setting(name: String, value: Variant, type: int, hint: int = PROPERTY_
 		hint = hint,
 		hint_string = hint_string
 	})
-	ProjectSettings.set_initial_value(setting_name, value)
+	if feature.is_empty():
+		ProjectSettings.set_initial_value(setting_name, value)
 
 
 static func get_setting_name(name: String, feature: String = "") -> String:

@@ -18,4 +18,10 @@ enum Quality {
 
 static func get_quality() -> Quality:
 	var quality = ProjectSettings.get_setting_with_override(S_PRESET)
+	print(quality)
+	print(ProjectSettings.has_setting("scene_profile/preset"))
+	print(OS.has_feature("template_release"))
+	print(OS.has_feature("template_debug"))
+	print(ProjectSettings.get_setting("scene_profile/preset"))
+	print(ProjectSettings.get_setting("scene_profile/preset.template_release"))
 	return quality if quality != null else Quality.MEDIUM

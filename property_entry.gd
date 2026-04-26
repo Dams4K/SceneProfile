@@ -2,19 +2,20 @@
 extends Resource
 class_name PropertyEntry
 
-@export_custom(PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE) var target: Object = null
+@export_custom(PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE) var target: Object = null :
+	set(value):
+		target = value
+		_cache_property_info()
 @export var property: StringName = "":
 	set(value):
 		property = value
 		notify_property_list_changed()
 @export_tool_button("Pick") var pick_property_button = _pick_property
 
-var _values: Array[Variant] = []
+@export_storage var _values: Dictionary[int, Variant] = {}
 
 var _cached_property_info: Dictionary = {}
 
-func _init() -> void:
-	_values.resize(Presets.Quality.size())
 
 
 func get_value(quality: Presets.Quality) -> Variant:
@@ -55,6 +56,7 @@ func _cache_property_info() -> void:
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
 	var property_info := _cached_property_info
+	
 	if property_info.is_empty():
 		return properties
 	
@@ -72,9 +74,7 @@ func _get_property_list() -> Array[Dictionary]:
 
 func _get(p_property: StringName) -> Variant:
 	var idx: int = Presets.Quality.get(p_property.to_upper(), -1)
-	if idx == -1:
-		return null
-	return _values[idx]
+	return _values.get(idx, null)
 
 
 func _set(p_property: StringName, p_value: Variant) -> bool:
