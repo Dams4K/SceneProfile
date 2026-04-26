@@ -8,14 +8,21 @@ class_name NodeItem
 		entries = p_entries
 		_sync_targets()
 
-func apply() -> void:
-	pass
+
+func apply(preset: SceneProfileInterpretor.Presets) -> void:
+	var target := get_target()
+	for entry in entries:
+		target.set(entry.property, entry.get_value(preset))
+
+
+func get_target() -> Object:
+	return interpretor.get_node_or_null(node_path)
 
 
 func _sync_targets() -> void:
-	if SceneProfileInterpretor.instance == null:
+	if interpretor == null:
 		return
 	
 	for entry in entries:
 		if entry == null: continue
-		entry.target = SceneProfileInterpretor.instance.get_node_or_null(node_path)
+		entry.target = get_target()

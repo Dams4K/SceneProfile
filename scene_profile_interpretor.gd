@@ -9,11 +9,24 @@ enum Presets {
 	ULTRA
 }
 
-static var instance: SceneProfileInterpretor
-
 @export var editor_preset := Presets.MEDIUM
 
-@export var items: Array[ProfileItem] = []
+@export var items: Array[ProfileItem] = []:
+	set(value):
+		items = value
+		_sync_interpretors()
+
 
 func _ready() -> void:
-	instance = self
+	apply()
+
+
+func _sync_interpretors() -> void:
+	for item: ProfileItem in items:
+		item.interpretor = self
+
+
+func apply() -> void:
+	var preset := SceneProfilePlugin.get_preset()
+	for item: ProfileItem in items:
+		item.apply(preset)

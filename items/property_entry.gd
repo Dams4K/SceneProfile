@@ -7,7 +7,7 @@ class_name PropertyEntry
 	set(value):
 		property = value
 		notify_property_list_changed()
-@export_tool_button("Pick") var pick_property_button = pick_property
+@export_tool_button("Pick") var pick_property_button = _pick_property
 
 var _values: Array[Variant] = []
 
@@ -15,7 +15,11 @@ func _init() -> void:
 	_values.resize(SceneProfileInterpretor.Presets.size())
 
 
-func pick_property() -> void:
+func get_value(preset: SceneProfileInterpretor.Presets) -> Variant:
+	return _get(SceneProfileInterpretor.Presets.keys()[preset])
+
+
+func _pick_property() -> void:
 	assert(target != null, "Target object can't be null")
 	
 	EditorInterface.popup_property_selector(target, _on_property_selected, PackedInt32Array(), property)

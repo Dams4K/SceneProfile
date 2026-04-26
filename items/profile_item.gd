@@ -2,4 +2,6 @@
 extends Resource
 class_name ProfileItem
 
-@abstract func apply() -> void
+var interpretor: SceneProfileInterpretor
+
+@abstract func apply(preset: SceneProfileInterpretor.Presets) -> void
