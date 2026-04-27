@@ -27,7 +27,13 @@ func apply(quality: Presets.Quality) -> void:
 	if not is_valid(): return
 	
 	var arguments: Arguments = get_value(quality)
-	target.callv(method, arguments.arguments)
+	if arguments == null: return
+	var args: Array[Variant] = arguments.arguments.duplicate()
+	for i in range(args.size()):
+		if args[i] is Wrapper:
+			args[i] = args[i].get_obj()
+	
+	target.callv(method, args)
 
 
 func _get_quality_property(quality: String) -> Dictionary:

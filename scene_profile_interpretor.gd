@@ -14,6 +14,7 @@ class_name SceneProfileInterpretor
 
 
 func _ready() -> void:
+	quality = Presets.get_quality() # Force
 	_sync_interpretors()
 	apply()
 
