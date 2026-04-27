@@ -7,6 +7,7 @@ class_name SingletonItem
 	set(v):
 		singleton = v
 		target = Engine.get_singleton(v)
+		_sync_targets()
 
 func _init() -> void:
 	target = Engine.get_singleton(singleton)

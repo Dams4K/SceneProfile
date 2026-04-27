@@ -7,5 +7,3 @@ func _init() -> void:
 
 func apply(quality: Presets.Quality) -> void:
 	super.apply(quality)
-	RenderingServer.force_sync()
-	RenderingServer.force_draw(false)

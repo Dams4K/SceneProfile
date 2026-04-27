@@ -33,7 +33,8 @@ func update_scene(scene: Node) -> void:
 		return
 	
 	var interpretors := scene.find_children("*", "SceneProfileInterpretor")
-	for interpretor in interpretors:
+	for interpretor: SceneProfileInterpretor in interpretors:
+		interpretor.quality = Presets.get_quality()
 		interpretor.apply()
 
 
